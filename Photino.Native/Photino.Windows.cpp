@@ -916,13 +916,13 @@ void Photino::ShowNotification(
 		WinToastTemplate toast = WinToastTemplate(toastType);
 
 		if (firstLine != NULL)
-			toast.setFirstLine(ToUTF16String(firstLine));
+			toast.setTextField(ToUTF16String(firstLine), WinToastTemplate::FirstLine);
 
 		if (secondLine != NULL)
-			toast.setSecondLine(ToUTF16String(secondLine));
+			toast.setTextField(ToUTF16String(secondLine), WinToastTemplate::SecondLine);
 
 		if (thirdLine != NULL)
-			toast.setThirdLine(ToUTF16String(thirdLine));
+			toast.setTextField(ToUTF16String(thirdLine), WinToastTemplate::ThirdLine);
 
 		if (attributionText != NULL)
 			toast.setAttributionText(ToUTF16String(attributionText));
