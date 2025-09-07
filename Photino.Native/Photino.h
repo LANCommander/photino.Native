@@ -6,6 +6,7 @@
 #include <WebView2.h>
 typedef wchar_t *AutoString;
 class WinToastHandler;
+class PhotinoNotification;
 #else
 // AutoString for macOS/Linux
 typedef char *AutoString;
@@ -55,6 +56,17 @@ typedef void (*FocusOutCallback)();
 
 class PhotinoDialog;
 class Photino;
+
+enum PhotinoNotificationType {
+	ImageAndText01,
+	ImageAndText02,
+	ImageAndText03,
+	ImageAndText04,
+	Text01,
+	Text02,
+	Text03,
+	Text04,
+};
 
 struct PhotinoInitParams
 {
@@ -290,6 +302,19 @@ public:
 	void SetTitle(AutoString title);
 	void SetTopmost(bool topmost);
 	void SetZoom(int zoom);
+
+	void ShowNotification(
+		AutoString firstLine,
+		AutoString secondLine,
+		AutoString thirdLine,
+		AutoString attributionText,
+		AutoString iconPath,
+		PhotinoNotificationType type,
+		AutoString button1,
+		AutoString button2,
+		AutoString button3,
+		AutoString button4,
+		AutoString button5);
 
 	void ShowNotification(AutoString title, AutoString message);
 	void WaitForExit();

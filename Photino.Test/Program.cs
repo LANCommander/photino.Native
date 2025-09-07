@@ -97,7 +97,7 @@ namespace Photino.NET
                 //.Offset(new Point(150, 150))
                 //.Offset(250, 250)
                 .SetNotificationRegistrationId("8FDF1B15-3408-47A6-8EF5-2B0676B76277")  //Replaces the window title when registering toast notifications
-                .SetNotificationsEnabled(false)
+                .SetNotificationsEnabled(true)
 
                 //Browser settings
                 //.SetContextMenuEnabled(false)
@@ -130,6 +130,7 @@ namespace Photino.NET
 
                 .SetLogVerbosity(_logEvents ? 2 : 0);
 
+            
             mainWindow.WaitForClose();
 
             Console.WriteLine("Done Blocking!");
@@ -487,7 +488,18 @@ namespace Photino.NET
 
         private static void WindowCreated(object sender, EventArgs e)
         {
+            var window = (PhotinoWindow)sender;
             Log(sender, "WindowCreated Callback Fired.");
+
+            window.SendNotification(builder =>
+            {
+                builder
+                    .AddText("Hello World!")
+                    .AddText("Lorem ipsum dolor sit amet")
+                    .AddText("Some third text!")
+                    .AddButton("Launch")
+                    .AddButton("Ignore");
+            });
         }
 
         private static void WindowLocationChanged(object sender, Point location)
