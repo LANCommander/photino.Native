@@ -300,9 +300,7 @@ Photino::Photino(PhotinoInitParams* initParams)
 		if (_notificationRegistrationId != NULL)
 			WinToast::instance()->setAppUserModelId(_notificationRegistrationId);
 
-		this->_toastHandler = new WinToastHandler(this);
 		WinToast::instance()->initialize();
-
 	}
 
 	_dialog = new PhotinoDialog(this);
@@ -855,116 +853,6 @@ void Photino::SetZoom(int zoom)
 	//wchar_t msg[50];
 	//swprintf(msg, 50, L"newZoom: %f", newZoom);
 	//MessageBox(nullptr, msg, L"Setter", MB_OK);
-}
-
-void Photino::ShowNotification(
-	AutoString firstLine,
-	AutoString secondLine,
-	AutoString thirdLine,
-	AutoString attributionText,
-	AutoString iconPath,
-	PhotinoNotificationType type,
-	AutoString button1,
-	AutoString button2,
-	AutoString button3,
-	AutoString button4,
-	AutoString button5)
-{
-	if (_notificationsEnabled && WinToast::isCompatible())
-	{
-		WinToastTemplate::WinToastTemplateType toastType;
-
-		switch (type)
-		{
-			case PhotinoNotificationType::ImageAndText01:
-				toastType = WinToastTemplate::ImageAndText01;
-				break;
-
-			case PhotinoNotificationType::ImageAndText02:
-				toastType = WinToastTemplate::ImageAndText02;
-				break;
-
-			case PhotinoNotificationType::ImageAndText03:
-				toastType = WinToastTemplate::ImageAndText03;
-				break;
-
-			case PhotinoNotificationType::ImageAndText04:
-				toastType = WinToastTemplate::ImageAndText04;
-				break;
-
-			case PhotinoNotificationType::Text01:
-				toastType = WinToastTemplate::Text01;
-				break;
-
-			case PhotinoNotificationType::Text02:
-				toastType = WinToastTemplate::Text02;
-				break;
-
-			case PhotinoNotificationType::Text03:
-				toastType = WinToastTemplate::Text03;
-				break;
-
-			case PhotinoNotificationType::Text04:
-				toastType = WinToastTemplate::Text04;
-				break;
-
-			default:
-				toastType = WinToastTemplate::Text01;
-				break;
-		}
-
-		WinToastTemplate toast = WinToastTemplate(toastType);
-
-		if (firstLine != NULL)
-			toast.setTextField(ToUTF16String(firstLine), WinToastTemplate::FirstLine);
-
-		if (secondLine != NULL)
-			toast.setTextField(ToUTF16String(secondLine), WinToastTemplate::SecondLine);
-
-		if (thirdLine != NULL)
-			toast.setTextField(ToUTF16String(thirdLine), WinToastTemplate::ThirdLine);
-
-		if (attributionText != NULL)
-			toast.setAttributionText(ToUTF16String(attributionText));
-
-		if (iconPath != NULL)
-			toast.setImagePath(ToUTF16String(iconPath));
-		else
-			toast.setImagePath(this->_iconFileName);
-
-		if (button1 != NULL)
-			toast.addAction(ToUTF16String(button1));
-
-		if (button2 != NULL)
-			toast.addAction(ToUTF16String(button2));
-
-		if (button3 != NULL)
-			toast.addAction(ToUTF16String(button3));
-
-		if (button4 != NULL)
-			toast.addAction(ToUTF16String(button4));
-
-		if (button5 != NULL)
-			toast.addAction(ToUTF16String(button5));
-
-		// Show the toast
-		WinToast::instance()->showToast(toast, _toastHandler);
-	}
-}
-
-void Photino::ShowNotification(AutoString title, AutoString body)
-{
-	title = ToUTF16String(title);
-	body = ToUTF16String(body);
-	if (_notificationsEnabled && WinToast::isCompatible())
-	{
-		WinToastTemplate toast = WinToastTemplate(WinToastTemplate::ImageAndText02);
-		toast.setTextField(title, WinToastTemplate::FirstLine);
-		toast.setTextField(body, WinToastTemplate::SecondLine);
-		if (this->_iconFileName != NULL)
-			toast.setImagePath(this->_iconFileName);
-		WinToast::instance()->showToast(toast, _toastHandler);
-	}
 }
 
 void Photino::WaitForExit()

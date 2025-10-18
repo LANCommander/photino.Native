@@ -266,16 +266,6 @@ extern "C"
 		instance->SetZoom(zoom);
 	}
 
-	EXPORTED void Photino_ShowNotificationEx(Photino* instance, AutoString firstLine, AutoString secondLine, AutoString thirdLine, AutoString attributionText, AutoString iconPath, PhotinoNotificationType type, AutoString button1, AutoString button2, AutoString button3, AutoString button4, AutoString button5)
-	{
-		instance->ShowNotification(firstLine, secondLine, thirdLine, attributionText, iconPath, type, button1, button2, button3, button4, button5);
-	}
-	
-	EXPORTED void Photino_ShowNotification(Photino* instance, AutoString title, AutoString body)
-	{
-		instance->ShowNotification(title, body);
-	}
-
 	EXPORTED void Photino_WaitForExit(Photino* instance)
 	{
 		instance->WaitForExit();
