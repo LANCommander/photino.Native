@@ -416,7 +416,7 @@ namespace Photino.NET
                     .AddText("Hello World!")
                     .AddText("Lorem ipsum dolor sit amet")
                     .AddText("Some third text!")
-                    .SetImagePath("F:\\Repositories\\photino.Native\\Photino.Test\\testImage.jpg")
+                    .SetImagePath($"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\testImage.jpg")
                     .AddAction("Launch", (notification) =>
                     {
                         Log(notification, "Launch notification action clicked!");
