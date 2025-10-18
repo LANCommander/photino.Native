@@ -1,15 +1,20 @@
 #include "Photino.Notification.h"
-#include "Photino.Windows.ToastHandler.h"
 
-#include <vector>
-#include "Dependencies/wintoastlib.h"
+#ifdef _WIN32
+#include "Photino.Windows.ToastHandler.h"
+#endif
 
 WinToastLib::WinToastTemplate _toast;
 
 PhotinoNotification::PhotinoNotification(Photino* window)
 {
 	_window = window;
-	_handler = new WinToastHandler(this);
+	_handler = new PhotinoWinToastHandler(_window, this);
+}
+
+PhotinoNotification::~PhotinoNotification() 
+{
+	delete _handler;
 }
 
 std::vector<AutoString> PhotinoNotification::GetActions() const
@@ -27,30 +32,39 @@ void PhotinoNotification::SetType(PhotinoNotificationType type)
 	{
 		case PhotinoNotificationType::ImageAndText01:
 			winToastType = WinToastLib::WinToastTemplate::ImageAndText01;
+			break;
 
 		case PhotinoNotificationType::ImageAndText02:
 			winToastType = WinToastLib::WinToastTemplate::ImageAndText02;
+			break;
 
 		case PhotinoNotificationType::ImageAndText03:
 			winToastType = WinToastLib::WinToastTemplate::ImageAndText03;
+			break;
 
 		case PhotinoNotificationType::ImageAndText04:
 			winToastType = WinToastLib::WinToastTemplate::ImageAndText04;
+			break;
 
 		case PhotinoNotificationType::Text01:
 			winToastType = WinToastLib::WinToastTemplate::Text01;
+			break;
 
 		case PhotinoNotificationType::Text02:
 			winToastType = WinToastLib::WinToastTemplate::Text02;
+			break;
 
 		case PhotinoNotificationType::Text03:
 			winToastType = WinToastLib::WinToastTemplate::Text03;
+			break;
 
 		case PhotinoNotificationType::Text04:
 			winToastType = WinToastLib::WinToastTemplate::Text04;
+			break;
 
 		default:
 			winToastType = WinToastLib::WinToastTemplate::Text01;
+			break;
 	}
 
 	_toast = WinToastLib::WinToastTemplate(winToastType);
@@ -58,24 +72,26 @@ void PhotinoNotification::SetType(PhotinoNotificationType type)
 
 void PhotinoNotification::AddText(AutoString text)
 {
-	_textLines.push_back(text);
+	AutoString conv = _window->ToUTF16String(text);
+
+	_textLines.push_back(conv);
 
 	switch (_textLines.size())
 	{
 		case 1:
-			_toast.setTextField(_window->ToUTF16String(text), WinToastLib::WinToastTemplate::FirstLine);
+			_toast.setTextField(conv, WinToastLib::WinToastTemplate::FirstLine);
 			break;
 
 		case 2:
-			_toast.setTextField(_window->ToUTF16String(text), WinToastLib::WinToastTemplate::SecondLine);
+			_toast.setTextField(conv, WinToastLib::WinToastTemplate::SecondLine);
 			break;
 
 		case 3:
-			_toast.setTextField(_window->ToUTF16String(text), WinToastLib::WinToastTemplate::ThirdLine);
+			_toast.setTextField(conv, WinToastLib::WinToastTemplate::ThirdLine);
 			break;
 
 		case 4:
-			_toast.setAttributionText(_window->ToUTF16String(text));
+			_toast.setAttributionText(conv);
 			break;
 	}
 }

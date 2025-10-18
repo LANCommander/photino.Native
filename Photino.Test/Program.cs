@@ -411,7 +411,21 @@ namespace Photino.NET
             }
             else if (string.Compare(message, "toastNotification", true) == 0)
             {
-                currentWindow.SendNotification("Toast Title", " Toast message! 🤖");
+                currentWindow
+                    .CreateNotification(PhotinoNotificationType.ToastImageAndText04)
+                    .AddText("Hello World!")
+                    .AddText("Lorem ipsum dolor sit amet")
+                    .AddText("Some third text!")
+                    .SetImagePath("F:\\Repositories\\photino.Native\\Photino.Test\\testImage.jpg")
+                    .AddAction("Launch", (notification) =>
+                    {
+                        Log(notification, "Launch notification action clicked!");
+                    })
+                    .AddAction("Ignore", (notification) =>
+                    {
+                        Log(notification, "Ignore notification action clicked!");
+                    })
+                    .Show();
             }
             else if (string.Compare(message, "showOpenFile", true) == 0)
             {
@@ -491,15 +505,20 @@ namespace Photino.NET
             var window = (PhotinoWindow)sender;
             Log(sender, "WindowCreated Callback Fired.");
 
-            window.SendNotification(builder =>
-            {
-                builder
-                    .AddText("Hello World!")
-                    .AddText("Lorem ipsum dolor sit amet")
-                    .AddText("Some third text!")
-                    .AddButton("Launch")
-                    .AddButton("Ignore");
-            });
+            window
+                .CreateNotification(PhotinoNotificationType.ToastImageAndText04)
+                .AddText("Hello World!")
+                .AddText("Lorem ipsum dolor sit amet")
+                .AddText("Some third text!")
+                .AddAction("Launch", (notification) =>
+                {
+                    Log(notification, "Launch notification action clicked!");
+                })
+                .AddAction("Ignore", (notification) =>
+                {
+                    Log(notification, "Ignore notification action clicked!");
+                })
+                .Show();
         }
 
         private static void WindowLocationChanged(object sender, Point location)

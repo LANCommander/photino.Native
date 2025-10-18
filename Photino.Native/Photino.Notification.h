@@ -4,9 +4,10 @@
 #define PHOTINO_NOTIFICATION_H
 
 #include "Photino.h"
+#include <vector>
 
-#ifndef _WIN32
-#include "Dependencies/wintoastlib.h"
+#ifdef _WIN32
+class PhotinoWinToastHandler;
 #endif
 
 enum class PhotinoNotificationType {
@@ -26,7 +27,7 @@ enum class PhotinoNotificationDismissalReason {
 	TimedOut,
 };
 
-typedef void (*ActionCallback)(AutoString action);
+typedef void (*ActionCallback)(int actionIndex);
 typedef void (*ActivatedCallback)();
 typedef void (*DismissedCallback)(PhotinoNotificationDismissalReason reason);
 
@@ -44,12 +45,11 @@ private:
 	AutoString _imagePath;
 
 public:
-#ifdef _WIN32
 	PhotinoNotification(Photino* window);
-#else
-	PhotinoNotification();
-#endif
+
+#ifdef _WIN32
 	~PhotinoNotification();
+#endif
 
 	std::vector<AutoString> GetActions() const;
 
@@ -63,10 +63,10 @@ public:
 	void SetActivatedCallback(ActivatedCallback callback) { _activatedCallback = callback; }
 	void SetDismissedCallback(DismissedCallback callback) { _dismissedCallback = callback; }
 
-	void InvokeAction(AutoString action) const
+	void InvokeAction(int actionIndex) const
 	{
 		if (_actionCallback)
-			return _actionCallback(action);
+			return _actionCallback(actionIndex);
 	}
 
 	void InvokeActivated() const
@@ -83,8 +83,8 @@ public:
 
 protected:
 #ifdef _WIN32
-	Photino* _window;
-	WinToastHandler* _handler;
+	Photino* _window{};
+	PhotinoWinToastHandler* _handler{};
 #endif
 };
 
