@@ -272,6 +272,16 @@ extern "C"
 		instance->SetZoom(zoom);
 	}
 
+	EXPORTED void Photino_StartDragging(Photino* instance) 
+	{
+		instance->StartDragging();
+	}
+
+	EXPORTED void Photino_StartResizing(Photino* instance, PhotinoWindowHitTestCode hitTestCode) 
+	{
+		instance->StartResizing(hitTestCode);
+	}
+	
 	EXPORTED void Photino_SetFlash(Photino* instance, bool state)
 	{
 		instance->SetFlash(state);

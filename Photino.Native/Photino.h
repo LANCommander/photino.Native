@@ -41,6 +41,18 @@ struct Monitor
 	double scale;
 };
 
+enum class PhotinoWindowHitTestCode 
+{
+	Left,
+	Right,
+	Top,
+	Bottom,
+	TopLeft,
+	TopRight,
+	BottomLeft,
+	BottomRight,
+};
+
 enum class PhotinoWindowProgressState 
 {
 	Error,
@@ -305,6 +317,10 @@ public:
 	void SetFlash(bool state);
 	void SetProgress(ULONGLONG current, ULONGLONG total, PhotinoWindowProgressState state);
 	void ClearProgress();
+
+	// Window manipulation
+	void StartDragging();
+	void StartResizing(PhotinoWindowHitTestCode hitTest);
 
 	void WaitForExit();
 
