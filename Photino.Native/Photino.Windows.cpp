@@ -518,6 +518,13 @@ void Photino::Center()
 	SetPosition(left, top);
 }
 
+void Photino::Focus()
+{
+	ShowWindow(_hWnd, SW_SHOW);
+	ShowWindow(_hWnd, SW_RESTORE);
+	SetForegroundWindow(_hWnd);
+}
+
 void Photino::Close()
 {
 	PostMessage(_hWnd, WM_CLOSE, NULL, NULL);
