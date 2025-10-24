@@ -174,6 +174,9 @@ COPY .\$(OutDir)WebView2Loader.dll ..\Photino.Test\bin\Debug\net8.0\</Command>
       </Message>
       <Command>
       </Command>
+      <Command>COPY .\$(OutDir)Photino.Native.dll ..\Photino.Test\bin\Debug\net8.0\
+COPY .\$(OutDir)Photino.Native.pdb ..\Photino.Test\bin\Debug\net8.0\
+COPY .\$(OutDir)WebView2Loader.dll ..\Photino.Test\bin\Debug\net8.0\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
