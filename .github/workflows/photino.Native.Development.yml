@@ -1,0 +1,262 @@
+name: Build Photino.Native
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  buildConfiguration: Release
+  MAJOR: 4
+  MINOR: 0
+  # Note: PATCH below is set per-job in "PublishPackage" using github.run_number
+
+jobs:
+  Publish_Nuspec:
+    name: Publish .nuspec
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload .nuspec artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: .nuspec
+          path: ./Photino.Native/Photino.Native.nuspec
+
+  Build_Win_x64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore (Windows x64)
+        run: nuget restore Photino.Native.sln -NonInteractive
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build (Windows x64)
+        run: >
+          msbuild ./Photino.Native/Photino.Native.vcxproj
+          /p:Configuration=${{ env.buildConfiguration }}
+          /p:Platform=x64
+
+      - name: Upload Windows x64 libs
+        uses: actions/upload-artifact@v4
+        with:
+          name: photino.Native-Windows-x64
+          path: ./Photino.Native/x64/${{ env.buildConfiguration }}
+
+  Build_Win_Arm64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore (Windows ARM64)
+        run: nuget restore Photino.Native.sln -NonInteractive
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build (Windows ARM64)
+        run: >
+          msbuild ./Photino.Native/Photino.Native.vcxproj
+          /p:Configuration=${{ env.buildConfiguration }}
+          /p:Platform=ARM64
+
+      - name: Upload Windows ARM64 libs
+        uses: actions/upload-artifact@v4
+        with:
+          name: photino.Native-Windows-arm64
+          path: ./Photino.Native/arm64/${{ env.buildConfiguration }}
+
+  Build_Linux_x64:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build (Linux x64)
+        shell: bash
+        run: |
+          mkdir -p ./Photino.Native/x64/${{ env.buildConfiguration }}
+          make linux-x64
+          mv ./lib/x64/Photino.Native.so ./Photino.Native/x64/${{ env.buildConfiguration }}/Photino.Native.so
+
+      - name: Upload Linux x64 libs
+        uses: actions/upload-artifact@v4
+        with:
+          name: photino.Native-Linux-x64
+          path: ./Photino.Native/x64/${{ env.buildConfiguration }}
+
+  # If/when you want to build Linux ARM64 on native hardware or via cross, uncomment and adapt:
+  # Build_Linux_Arm64:
+  #   runs-on: ubuntu-24.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Build (Linux ARM64)
+  #       shell: bash
+  #       run: |
+  #         mkdir -p ./Photino.Native/arm64/${{ env.buildConfiguration }}
+  #         make linux-dev
+  #         mv ./lib/dev/Photino.Native.so ./Photino.Native/arm64/${{ env.buildConfiguration }}/Photino.Native.so
+  #     - name: Upload Linux ARM64 libs
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: LinuxArm64Artifact
+  #         path: ./Photino.Native/arm64/${{ env.buildConfiguration }}
+
+  Build_Mac_Universal:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build (macOS universal)
+        shell: bash
+        run: |
+          mkdir -p ./Photino.Native/x64/${{ env.buildConfiguration }}
+          mkdir -p ./Photino.Native/arm64/${{ env.buildConfiguration }}
+          make mac-universal
+          cp ./lib/x64/Photino.Native.dylib ./Photino.Native/x64/${{ env.buildConfiguration }}/Photino.Native.dylib
+          cp ./lib/x64/Photino.Native.dylib ./Photino.Native/arm64/${{ env.buildConfiguration }}/Photino.Native.dylib
+
+      - name: Upload macOS x64 dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: photino.Native-macOS-x64
+          path: ./Photino.Native/x64/${{ env.buildConfiguration }}/Photino.Native.dylib
+
+      - name: Upload macOS ARM64 dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: photino.Native-macOS-arm64
+          path: ./Photino.Native/arm64/${{ env.buildConfiguration }}/Photino.Native.dylib
+
+#   Copy_Manual_Arm64_Releases:
+#     runs-on: ubuntu-24.04
+#     steps:
+#       - uses: actions/checkout@v4
+# 
+#       - name: Copy ARM64 native assets
+#         shell: bash
+#         run: |
+#           mkdir -p ./Photino.Native/arm64/${{ env.buildConfiguration }}
+#           mv ./manual-arm-release/linux-arm64/Photino.Native.so ./Photino.Native/arm64/${{ env.buildConfiguration }}/Photino.Native.so
+# 
+#       - name: Upload Linux ARM64 libs
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: LinuxArm64Artifact
+#           path: ./Photino.Native/arm64/${{ env.buildConfiguration }}
+
+#  PublishPackage:
+#    runs-on: windows-latest
+#    needs:
+#      - Publish_Nuspec
+#      - Build_Win_x64
+#      - Build_Win_Arm64
+#      - Build_Linux_x64
+#      - Build_Mac_Universal
+#       - Copy_Manual_Arm64_Releases
+#    steps:
+#       - name: Prepare workspace directory
+#         run: mkdir $env:GITHUB_WORKSPACE\pkg
+# 
+#       - name: Download NuspecArtifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: NuspecArtifact
+#           path: ${{ github.workspace }}\pkg
+# 
+#       - name: Download WindowsIntelArtifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: WindowsIntelArtifact
+#           path: ${{ github.workspace }}\pkg\x64
+# 
+#       - name: Download WindowsArm64Artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: WindowsArm64Artifact
+#           path: ${{ github.workspace }}\pkg\arm64
+# 
+#       - name: Download LinuxIntelArtifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: LinuxIntelArtifact
+#           path: ${{ github.workspace }}\pkg\x64
+# 
+#       - name: Download LinuxArm64Artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: LinuxArm64Artifact
+#           path: ${{ github.workspace }}\pkg\arm64
+# 
+#       - name: Download MacOsIntelArtifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: MacOsIntelArtifact
+#           path: ${{ github.workspace }}\pkg\x64
+# 
+#       - name: Download MacOsArm64Artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: MacOsArm64Artifact
+#           path: ${{ github.workspace }}\pkg\arm64
+# 
+#       - name: List downloaded files (root)
+#         shell: pwsh
+#         run: Get-ChildItem -Recurse $env:GITHUB_WORKSPACE\pkg | Format-Table -AutoSize
+# 
+#       - name: List x64
+#         shell: pwsh
+#         run: Get-ChildItem -Recurse $env:GITHUB_WORKSPACE\pkg\x64 | Format-Table -AutoSize
+# 
+#       - name: List arm64
+#         shell: pwsh
+#         run: Get-ChildItem -Recurse $env:GITHUB_WORKSPACE\pkg\arm64 | Format-Table -AutoSize
+# 
+#       - name: Setup NuGet
+#         uses: NuGet/setup-nuget@v2
+# 
+#       - name: Compute version
+#         id: ver
+#         shell: pwsh
+#         run: |
+#           $patch = "${{ github.run_number }}"
+#           $version = "${{ env.MAJOR }}.${{ env.MINOR }}.$patch"
+#           "patch=$patch"   | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+#           "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+#           Write-Host "Version: $version"
+# 
+#       - name: Pack nupkg
+#         shell: pwsh
+#         working-directory: ${{ github.workspace }}\pkg
+#         run: |
+#           nuget pack Photino.Native.nuspec `
+#             -Version "${{ steps.ver.outputs.version }}" `
+#             -NonInteractive `
+#             -Properties "version=${{ steps.ver.outputs.version }}"
+# 
+#       - name: Upload nupkg as artifact (optional)
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: Photino.Native.nupkg
+#           path: ${{ github.workspace }}\pkg\**\*.nupkg
+# 
+#       - name: Push to nuget.org
+#         if: ${{ github.ref == 'refs/heads/master' }}
+#         shell: pwsh
+#         working-directory: ${{ github.workspace }}\pkg
+#         env:
+#           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+#         run: |
+#           nuget push **\*.nupkg `
+#             -Source "https://api.nuget.org/v3/index.json" `
+#             -ApiKey "$env:NUGET_API_KEY" `
+#             -NonInteractive
